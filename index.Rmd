@@ -5,6 +5,6 @@ date:
 output: html_document
 ---
 
-[Simulating the Notebook Context](./simulating_notebook_context.html)
+* [Simulating the Notebook Context](./simulating_notebook_context.html)
 
 
