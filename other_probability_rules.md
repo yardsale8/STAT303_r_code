@@ -23,12 +23,12 @@ head(notebook)
 
 ```
   Toss_1 Toss_2 Toss_3
-1      T      T      T
-2      T      T      T
-3      T      H      H
-4      H      H      H
-5      T      H      T
-6      H      H      H
+1      T      H      T
+2      T      T      H
+3      H      H      T
+4      T      T      T
+5      H      H      T
+6      H      T      H
 ```
 
 First Toss is a Head
@@ -43,12 +43,12 @@ head(notebook)
 
 ```
   Toss_1 Toss_2 Toss_3 first_head
-1      T      T      T      FALSE
-2      T      T      T      FALSE
-3      T      H      H      FALSE
-4      H      H      H       TRUE
-5      T      H      T      FALSE
-6      H      H      H       TRUE
+1      T      H      T      FALSE
+2      T      T      H      FALSE
+3      H      H      T       TRUE
+4      T      T      T      FALSE
+5      H      H      T       TRUE
+6      H      T      H       TRUE
 ```
 
 Majority of Tosses are Heads
@@ -66,12 +66,12 @@ head(notebook)
 
 ```
   Toss_1 Toss_2 Toss_3 first_head num_heads majority_heads
-1      T      T      T      FALSE         0          FALSE
-2      T      T      T      FALSE         0          FALSE
-3      T      H      H      FALSE         2           TRUE
-4      H      H      H       TRUE         3           TRUE
-5      T      H      T      FALSE         1          FALSE
-6      H      H      H       TRUE         3           TRUE
+1      T      H      T      FALSE         1          FALSE
+2      T      T      H      FALSE         1          FALSE
+3      H      H      T       TRUE         2           TRUE
+4      T      T      T      FALSE         0          FALSE
+5      H      H      T       TRUE         2           TRUE
+6      H      T      H       TRUE         2           TRUE
 ```
 
 
@@ -103,18 +103,18 @@ head(notebook_and)
 
 ```
   Toss_1 Toss_2 Toss_3 first_head num_heads majority_heads
-1      T      T      T      FALSE         0          FALSE
-2      T      T      T      FALSE         0          FALSE
-3      T      H      H      FALSE         2           TRUE
-4      H      H      H       TRUE         3           TRUE
-5      T      H      T      FALSE         1          FALSE
-6      H      H      H       TRUE         3           TRUE
+1      T      H      T      FALSE         1          FALSE
+2      T      T      H      FALSE         1          FALSE
+3      H      H      T       TRUE         2           TRUE
+4      T      T      T      FALSE         0          FALSE
+5      H      H      T       TRUE         2           TRUE
+6      H      T      H       TRUE         2           TRUE
   first_head & majority_heads
 1                       FALSE
 2                       FALSE
-3                       FALSE
-4                        TRUE
-5                       FALSE
+3                        TRUE
+4                       FALSE
+5                        TRUE
 6                        TRUE
 ```
 
@@ -136,18 +136,18 @@ head(notebook_or)
 
 ```
   Toss_1 Toss_2 Toss_3 first_head num_heads majority_heads
-1      T      T      T      FALSE         0          FALSE
-2      T      T      T      FALSE         0          FALSE
-3      T      H      H      FALSE         2           TRUE
-4      H      H      H       TRUE         3           TRUE
-5      T      H      T      FALSE         1          FALSE
-6      H      H      H       TRUE         3           TRUE
+1      T      H      T      FALSE         1          FALSE
+2      T      T      H      FALSE         1          FALSE
+3      H      H      T       TRUE         2           TRUE
+4      T      T      T      FALSE         0          FALSE
+5      H      H      T       TRUE         2           TRUE
+6      H      T      H       TRUE         2           TRUE
   first_head | majority_heads
 1                       FALSE
 2                       FALSE
 3                        TRUE
-4                        TRUE
-5                       FALSE
+4                       FALSE
+5                        TRUE
 6                        TRUE
 ```
 
@@ -169,12 +169,12 @@ head(notebook_cond)
 
 ```
   Toss_1 Toss_2 Toss_3 first_head num_heads majority_heads
-1      H      H      H       TRUE         3           TRUE
-2      H      H      H       TRUE         3           TRUE
-3      H      H      T       TRUE         2           TRUE
-4      H      T      H       TRUE         2           TRUE
-5      H      H      T       TRUE         2           TRUE
-6      H      T      T       TRUE         1          FALSE
+1      H      H      T       TRUE         2           TRUE
+2      H      H      T       TRUE         2           TRUE
+3      H      T      H       TRUE         2           TRUE
+4      H      H      T       TRUE         2           TRUE
+5      H      T      H       TRUE         2           TRUE
+6      H      H      H       TRUE         3           TRUE
 ```
 
 In Summary
