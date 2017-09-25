@@ -9,5 +9,6 @@ output: html_document
 * [Other Probability Rules](./other_probability_rules.html)
 * [Simulating the Mean](./expected_value_simulation.html)
 * [Simulating the Variance](./variance_simulations.html)
+* [Simulating the Binomial Distribution](./simulating_the_binomial_distribution.html)
 
 
