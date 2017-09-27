@@ -58,7 +58,7 @@ Step 1 - Create the notebook
 =======================================================
 
 ```{r}
-df <- data.frame(num_success = rbinom(100, 3, 0.6))
+df <- data.frame(num_success = rbinom(10000, 6, 0.01))
 head(df)
 ```
 

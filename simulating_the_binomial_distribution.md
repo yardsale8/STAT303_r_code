@@ -30,12 +30,12 @@ replicate(100, sample(coin, 3, replace = TRUE)) %>% t() %>%
 
 ```
   T1 T2 T3 num_success
-1  S  F  S           2
+1  S  S  S           3
 2  S  S  S           3
-3  S  F  S           2
-4  F  F  S           1
-5  S  S  F           2
-6  S  F  F           1
+3  S  F  F           1
+4  S  S  S           3
+5  S  F  F           1
+6  S  F  S           2
 ```
 
 Sampling from the Binomial - The Fast Way
@@ -61,11 +61,11 @@ data.frame(num_success = rbinom(100, 3, 0.6)) %>%
 ```
   num_success
 1           2
-2           1
-3           0
-4           1
-5           2
-6           3
+2           2
+3           2
+4           2
+5           1
+6           1
 ```
 
 Example 2 - Approximate with a Simulation
@@ -81,18 +81,18 @@ Step 1 - Create the notebook
 
 
 ```r
-df <- data.frame(num_success = rbinom(100, 3, 0.6))
+df <- data.frame(num_success = rbinom(10000, 6, 0.01))
 head(df)
 ```
 
 ```
   num_success
-1           2
-2           3
-3           1
-4           2
-5           3
-6           2
+1           0
+2           0
+3           0
+4           0
+5           0
+6           0
 ```
 
 Step 2 - mutate based on the question
@@ -108,12 +108,12 @@ head(df)
 
 ```
   num_success at_least_1
-1           2       TRUE
-2           3       TRUE
-3           1       TRUE
-4           2       TRUE
-5           3       TRUE
-6           2       TRUE
+1           0      FALSE
+2           0      FALSE
+3           0      FALSE
+4           0      FALSE
+5           0      FALSE
+6           0      FALSE
 ```
 
 Step 3 - summarize to estimate the probability
@@ -128,7 +128,7 @@ df %>%
 
 ```
   prob_success
-1         0.94
+1       0.0589
 ```
 
 Computing the exact probabilities in R
