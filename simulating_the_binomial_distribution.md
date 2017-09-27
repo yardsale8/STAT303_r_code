@@ -30,11 +30,11 @@ replicate(100, sample(coin, 3, replace = TRUE)) %>% t() %>%
 
 ```
   T1 T2 T3 num_success
-1  S  S  S           3
+1  S  F  F           1
 2  S  S  S           3
-3  S  F  F           1
-4  S  S  S           3
-5  S  F  F           1
+3  F  S  F           1
+4  S  S  F           2
+5  S  S  F           2
 6  S  F  S           2
 ```
 
@@ -60,12 +60,12 @@ data.frame(num_success = rbinom(100, 3, 0.6)) %>%
 
 ```
   num_success
-1           2
+1           0
 2           2
-3           2
-4           2
-5           1
-6           1
+3           1
+4           3
+5           2
+6           2
 ```
 
 Example 2 - Approximate with a Simulation
@@ -128,7 +128,7 @@ df %>%
 
 ```
   prob_success
-1       0.0589
+1       0.0602
 ```
 
 Computing the exact probabilities in R
