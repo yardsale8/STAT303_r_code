@@ -568,28 +568,174 @@ heights[!is.na(heights)]
 Removing `NA`s
 ========================================================
 
-
-```r
+```
 ## Returns the object with incomplete cases removed. The returned object is atomic.
 na.omit(heights)
-```
+
+## Extract those elements which are complete cases.
+heights[complete.cases(heights)]
 
 ```
-[1] 2 4 4 6
-attr(,"na.action")
-[1] 4
-attr(,"class")
-[1] "omit"
+
+Reading files
+========================================================
+
+
+```r
+# Navigate to the file
+surveys <- read.csv( file.choose() )
 ```
 
 ```r
-## Extract those elements which are complete cases.
-heights[complete.cases(heights)]
+# Using a path
+surveys <- read.csv('data/portal_data_joined.csv', # The path
+                    header=TRUE, # This file has a header
+                    sep=",") # How data is separated
+```
+
+Viewing a data frame
+========================================================
+
+
+```r
+head(surveys)
 ```
 
 ```
-[1] 2 4 4 6
+  record_id month day year plot_id species_id sex hindfoot_length weight
+1         1     7  16 1977       2         NL   M              32     NA
+2        72     8  19 1977       2         NL   M              31     NA
+3       224     9  13 1977       2         NL                  NA     NA
+4       266    10  16 1977       2         NL                  NA     NA
+5       349    11  12 1977       2         NL                  NA     NA
+6       363    11  12 1977       2         NL                  NA     NA
+    genus  species   taxa plot_type
+1 Neotoma albigula Rodent   Control
+2 Neotoma albigula Rodent   Control
+3 Neotoma albigula Rodent   Control
+4 Neotoma albigula Rodent   Control
+5 Neotoma albigula Rodent   Control
+6 Neotoma albigula Rodent   Control
 ```
+
+
+
+What is a data frame
+========================================================
+
+* A collection of named columns
+  * Column == vector
+  * Standard vector types
+
+
+Structure of a data frame
+========================================================
+
+
+```r
+str(surveys)
+```
+
+```
+'data.frame':	34786 obs. of  13 variables:
+ $ record_id      : int  1 72 224 266 349 363 435 506 588 661 ...
+ $ month          : int  7 8 9 10 11 11 12 1 2 3 ...
+ $ day            : int  16 19 13 16 12 12 10 8 18 11 ...
+ $ year           : int  1977 1977 1977 1977 1977 1977 1977 1978 1978 1978 ...
+ $ plot_id        : int  2 2 2 2 2 2 2 2 2 2 ...
+ $ species_id     : Factor w/ 48 levels "AB","AH","AS",..: 16 16 16 16 16 16 16 16 16 16 ...
+ $ sex            : Factor w/ 3 levels "","F","M": 3 3 1 1 1 1 1 1 3 1 ...
+ $ hindfoot_length: int  32 31 NA NA NA NA NA NA NA NA ...
+ $ weight         : int  NA NA NA NA NA NA NA NA 218 NA ...
+ $ genus          : Factor w/ 26 levels "Ammodramus","Ammospermophilus",..: 13 13 13 13 13 13 13 13 13 13 ...
+ $ species        : Factor w/ 40 levels "albigula","audubonii",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ taxa           : Factor w/ 4 levels "Bird","Rabbit",..: 4 4 4 4 4 4 4 4 4 4 ...
+ $ plot_type      : Factor w/ 5 levels "Control","Long-term Krat Exclosure",..: 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+Other data frame inspection tools - Size
+========================================================
+
+* `dim(surveys)` - returns a vector with 
+  * the number of rows in the first element, and 
+  * the number of columns as the second element (the dimensions of the object)
+* `nrow(surveys)` - returns the number of rows
+* `ncol(surveys)` - returns the number of columns
+
+Other data frame inspection tools - Content
+========================================================
+
+  * `head(surveys)` - shows the first 6 rows
+  * `tail(surveys)` - shows the last 6 rows
+  
+Other data frame inspection tools - Names
+========================================================
+
+* `names(surveys)` - returns the column names 
+  * synonym of `colnames()`
+* `rownames(surveys)` - returns the row names
+
+Other data frame inspection tools - Summary
+========================================================
+
+* `str(surveys)` - structure of the object and information about the class, length and content of each column
+* `summary(surveys)` - summary statistics for each column
+
+Challenge
+========================================================
+Based on the output of `str(surveys)`, can you answer the following questions?
+
+* What is the class of the object surveys?
+* How many rows and how many columns are in this object?
+* How many species have been recorded during these surveys
+
+Getting data from a data frame - Indexing
+========================================================
+
+Try each of the following
+
+```r
+surveys[1, 1]   # first element in the first column of the data frame (as a vector)
+surveys[1, 6]   # first element in the 6th column (as a vector)
+surveys[, 1]    # first column in the data frame (as a vector)
+surveys[1]      # first column in the data frame (as a data.frame)
+surveys[1:3, 7] # first three elements in the 7th column (as a vector)
+surveys[3, ]    # the 3rd element for all columns (as a data.frame)
+head_surveys <- surveys[1:6, ] # equivalent to head(surveys)
+```
+
+Excluding values with `-`
+========================================================
+
+
+```r
+surveys[,-1]          # The whole data frame, except the first column
+surveys[-c(7:34786),] # Equivalent to head(surveys)
+```
+
+Using column names
+========================================================
+
+
+```r
+surveys["species_id"]       # Result is a data.frame
+surveys[, "species_id"]     # Result is a vector
+surveys[["species_id"]]     # Result is a vector
+surveys$species_id          # Result is a vector
+```
+
+Challenge
+========================================================
+
+* Create a data.frame (surveys_200) containing only the observations from row 200 of the surveys dataset.
+* Notice how nrow() gave you the number of rows in a data.frame?
+
+  * Use that number to pull out just that last row in the data frame.
+  * Compare that with what you see as the last row using tail() to make sure it’s meeting expectations.
+  * Pull out that last row using nrow() instead of the row number.
+  * Create a new data frame object (surveys_last) from that last row.
+* Use nrow() to extract the row that is in the middle of the data frame. Store the content of this row in an object named surveys_middle.
+* Combine nrow() with the - notation above to reproduce the behavior of head(surveys) keeping just the first through 6th rows of the surveys dataset.
 
 
 
