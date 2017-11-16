@@ -14,7 +14,7 @@ Why use R?
 - free, open source, cross-platform
 - Large community
 
-Marketshare
+Market-share
 ========================================================
 
 ![](Fig-1a-IndeedJobs-2017.png)
@@ -315,7 +315,7 @@ char_logical <- c('a', 'b', 'c', TRUE)
 tricky <- c(1, 2, 3, '4')
 ```
 
-Subsetting Vectors
+Sub-setting Vectors
 ========================================================
 
 
@@ -346,7 +346,7 @@ more_animals
 [1] "mouse" "rat"   "dog"   "rat"   "mouse" "cat"  
 ```
 
-Conditional Subsetting
+Conditional Sub-setting
 ========================================================
 
 
@@ -359,7 +359,7 @@ weight_g[c(TRUE, FALSE, TRUE, TRUE, FALSE)]
 [1] 21 39 54
 ```
 
-Conditional Subsetting
+Conditional Sub-setting
 ========================================================
 
 
@@ -379,7 +379,7 @@ weight_g[weight_g > 50]
 [1] 54 55
 ```
 
-Conditional Subsetting
+Conditional Sub-setting
 ========================================================
 
 
@@ -727,7 +727,7 @@ surveys$species_id          # Result is a vector
 Challenge
 ========================================================
 
-* Create a data.frame (surveys_200) containing only the observations from row 200 of the surveys dataset.
+* Create a data.frame (surveys_200) containing only the observations from row 200 of the surveys data set.
 * Notice how nrow() gave you the number of rows in a data.frame?
 
   * Use that number to pull out just that last row in the data frame.
@@ -735,7 +735,260 @@ Challenge
   * Pull out that last row using nrow() instead of the row number.
   * Create a new data frame object (surveys_last) from that last row.
 * Use nrow() to extract the row that is in the middle of the data frame. Store the content of this row in an object named surveys_middle.
-* Combine nrow() with the - notation above to reproduce the behavior of head(surveys) keeping just the first through 6th rows of the surveys dataset.
+* Combine nrow() with the - notation above to reproduce the behavior of head(surveys) keeping just the first through 6th rows of the surveys data set.
+
+What is `dpylr` and `tidyverse`?
+========================================================
+
+- Package for managing and manipulating data
+- Consists of
+  - `dpylr`
+    - filter
+    - make new columns
+    - aggregate
+  - `tildr`
+    - Fix data and apply golden rule
+  - `ggplot`
+    - Nice graphics
+    
+    
+Installing `tidyverse`
+========================================================
+
+
+```r
+# Only need to do this once
+# Time consuming!
+install.packages("tidyverse")
+```
+
+Loading a Library
+========================================================
+
+
+```r
+# This loads all of the dpylr functions
+library("dplyr")
+```
+
+Selecting columns with `select`
+========================================================
+
+
+```r
+# Syntax: select(df, col1, col2, ...)
+new_df <- select(surveys, plot_id, species_id, weight)
+
+# Good habit: Always inspect the result with head
+head(new_df)
+```
+
+```
+  plot_id species_id weight
+1       2         NL     NA
+2       2         NL     NA
+3       2         NL     NA
+4       2         NL     NA
+5       2         NL     NA
+6       2         NL     NA
+```
+
+Selecting rows with `filter`
+========================================================
+
+
+```r
+new_df2 <- filter(surveys, year == 1995)
+head(new_df2)
+```
+
+```
+  record_id month day year plot_id species_id sex hindfoot_length weight
+1     22314     6   7 1995       2         NL   M              34     NA
+2     22728     9  23 1995       2         NL   F              32    165
+3     22899    10  28 1995       2         NL   F              32    171
+4     23032    12   2 1995       2         NL   F              33     NA
+5     22003     1  11 1995       2         DM   M              37     41
+6     22042     2   4 1995       2         DM   F              36     45
+      genus  species   taxa plot_type
+1   Neotoma albigula Rodent   Control
+2   Neotoma albigula Rodent   Control
+3   Neotoma albigula Rodent   Control
+4   Neotoma albigula Rodent   Control
+5 Dipodomys merriami Rodent   Control
+6 Dipodomys merriami Rodent   Control
+```
+
+```r
+# Why are there columns not select (last slide) still here?
+```
+
+Making a new column with `mutate`
+========================================================
+
+
+```r
+new_df <- select(surveys, plot_id, species_id, weight, year)
+new_df2 <- filter(new_df, year == 1995)
+new_df3 <- mutate(new_df2, weight_kg = weight / 1000)
+head(new_df3)
+```
+
+```
+  plot_id species_id weight year weight_kg
+1       2         NL     NA 1995        NA
+2       2         NL    165 1995     0.165
+3       2         NL    171 1995     0.171
+4       2         NL     NA 1995        NA
+5       2         DM     41 1995     0.041
+6       2         DM     45 1995     0.045
+```
+
+Fundamental `dyplr`/functional principles
+========================================================
+
+- data frame in, data frame out
+- returns a **new** data frame
+  - no mutation
+
+Imperative pattern - Save, save, save
+========================================================
+
+![](./imperative_pattern.png)
+- **Problem 1:** Lots of temporary variables
+- **Problem 2:** Messy and lots of *overhead*
+  - All the extra *stuff* clouds the meaning/intent of the code
+
+Poor solution - Rewrite to the same data frame
+========================================================
+
+
+```r
+# What is wrong with this approach?
+surveys <- select(surveys, plot_id, species_id, weight, year)
+surveys <- filter(surveys, year == 1995)
+surveys <- mutate(surveys, weight_kg = weight / 1000)
+head(surveys)
+```
+
+Use a pipe for cleaner code
+========================================================
+
+
+```r
+surveys  %>% 
+  select(         plot_id, species_id, weight, year) %>%
+  filter(         year == 1995) %>%
+  mutate(         weight_kg = weight / 1000) %>%
+  head(           )
+```
+
+```
+  plot_id species_id weight year weight_kg
+1       2         NL     NA 1995        NA
+2       2         NL    165 1995     0.165
+3       2         NL    171 1995     0.171
+4       2         NL     NA 1995        NA
+5       2         DM     41 1995     0.041
+6       2         DM     45 1995     0.045
+```
+
+Pipe pushes the data frame through the first position
+========================================================
+
+![](./pipe1.png)
+
+Imagine an invisible data frame in the first spot
+========================================================
+
+
+```r
+surveys  %>% 
+  select(#surveys,      
+                      plot_id, species_id, weight, year) %>%
+  filter(#df_sel,
+                      year == 1995) %>%
+  mutate(#df_sel_filt,     
+                      weight_kg = weight / 1000) %>%
+  head(#df_sel_filt_mutate        
+       )
+```
+
+```
+  plot_id species_id weight year weight_kg
+1       2         NL     NA 1995        NA
+2       2         NL    165 1995     0.165
+3       2         NL    171 1995     0.171
+4       2         NL     NA 1995        NA
+5       2         DM     41 1995     0.041
+6       2         DM     45 1995     0.045
+```
+
+Important Point - Each data frame is NEW
+========================================================
+
+![](./pipe2.png)
+
+
+Imagine the missing data frame ... but don't write it!
+========================================================
+
+
+```r
+surveys  %>% 
+  select(plot_id, species_id, weight, year) %>%
+  filter(year == 1995) %>%
+  mutate(weight_kg = weight / 1000) %>%
+  head()
+```
+
+```
+  plot_id species_id weight year weight_kg
+1       2         NL     NA 1995        NA
+2       2         NL    165 1995     0.165
+3       2         NL    171 1995     0.171
+4       2         NL     NA 1995        NA
+5       2         DM     41 1995     0.041
+6       2         DM     45 1995     0.045
+```
+
+Saving the result of a piped operation
+========================================================
+
+
+```r
+surveys_small <- surveys %>%
+  filter(weight < 5) %>%
+  select(species_id, sex, weight)
+
+head(surveys_small)
+```
+
+```
+  species_id sex weight
+1         PF   F      4
+2         PF   F      4
+3         PF   M      4
+4         RM   F      4
+5         RM   M      4
+6         PF          4
+```
+
+Challenge
+========================================================
+
+Create a new data frame from the surveys data that meets the following criteria: 
+
+- contains only the **`species_id`** column and 
+- a new column called  **`hindfoot_half`** 
+  - values that are half the **`hindfoot_length`** values. 
+- **`hindfoot_half`** column has 
+  - no `NA`s and 
+  - all values are less than 30.
+
+Hint: think about how the commands should be ordered to produce this data frame!
+
+
 
 
 
