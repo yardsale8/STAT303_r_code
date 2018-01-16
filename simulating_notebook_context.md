@@ -39,8 +39,10 @@ Today's Goals
 ========================================================
 
 - Simulate simple and compound events with `sample`
-- Combine compound outcomes into one string with `str_c`
 - Mimic the notebook context with a data frame
+- Understand the *shape* of simulation code for
+  - simple experiments
+  - compound experiments
 
 Using `sample` for simple experiments
 ========================================================
@@ -57,7 +59,7 @@ sample(sides, 1, replace = TRUE)
 ```
 
 ```
-[1] "T"
+[1] "H"
 ```
 
 ```r
@@ -65,7 +67,7 @@ sample(sides, 1, replace = TRUE)
 ```
 
 ```
-[1] "T"
+[1] "H"
 ```
 
 Using `sample` for compound experiments
@@ -78,7 +80,7 @@ sample(sides, 3, replace = TRUE)
 ```
 
 ```
-[1] "T" "T" "T"
+[1] "H" "H" "H"
 ```
 
 ```r
@@ -86,7 +88,7 @@ sample(sides, 3, replace = TRUE)
 ```
 
 ```
-[1] "T" "T" "T"
+[1] "T" "H" "T"
 ```
 
 Use `replicate` to repeat the experiment
@@ -109,9 +111,9 @@ trials
 
 ```
      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
-[1,] "H"  "T"  "T"  "T"  "H"  "T"  "H" 
-[2,] "T"  "T"  "T"  "H"  "H"  "T"  "H" 
-[3,] "T"  "H"  "H"  "T"  "H"  "H"  "H" 
+[1,] "H"  "H"  "H"  "H"  "T"  "H"  "T" 
+[2,] "T"  "T"  "T"  "T"  "T"  "T"  "H" 
+[3,] "H"  "T"  "H"  "H"  "H"  "H"  "H" 
 ```
 
 Transpose with `t` to make the data tall
@@ -127,13 +129,13 @@ t(trials)
 
 ```
      [,1] [,2] [,3]
-[1,] "H"  "T"  "T" 
-[2,] "T"  "T"  "H" 
-[3,] "T"  "T"  "H" 
-[4,] "T"  "H"  "T" 
-[5,] "H"  "H"  "H" 
-[6,] "T"  "T"  "H" 
-[7,] "H"  "H"  "H" 
+[1,] "H"  "T"  "H" 
+[2,] "H"  "T"  "T" 
+[3,] "H"  "T"  "H" 
+[4,] "H"  "T"  "H" 
+[5,] "T"  "T"  "H" 
+[6,] "H"  "T"  "H" 
+[7,] "T"  "H"  "H" 
 ```
 
 Package the outcomes in a data frame
@@ -145,19 +147,21 @@ library(dplyr)
 notebook <- trials %>% 
               t() %>% 
               as.data.frame() %>% 
-              setNames(c("Roll_1", "Roll_2", "Roll_3"))
+              setNames(c("R1", 
+                         "R2", 
+                         "R3"))
 notebook
 ```
 
 ```
-  Roll_1 Roll_2 Roll_3
-1      H      T      T
-2      T      T      H
-3      T      T      H
-4      T      H      T
-5      H      H      H
-6      T      T      H
-7      H      H      H
+  R1 R2 R3
+1  H  T  H
+2  H  T  T
+3  H  T  H
+4  H  T  H
+5  T  T  H
+6  H  T  H
+7  T  H  H
 ```
 
 Using `mutate` to asks questions about the trials
@@ -168,19 +172,19 @@ Using `mutate` to asks questions about the trials
 ```r
 library(dplyr)
 notebook <- notebook %>% 
-              mutate(first_head = (Roll_1 == "H"))
+              mutate(first_head = (R1 == "H"))
 notebook
 ```
 
 ```
-  Roll_1 Roll_2 Roll_3 first_head
-1      H      T      T       TRUE
-2      T      T      H      FALSE
-3      T      T      H      FALSE
-4      T      H      T      FALSE
-5      H      H      H       TRUE
-6      T      T      H      FALSE
-7      H      H      H       TRUE
+  R1 R2 R3 first_head
+1  H  T  H       TRUE
+2  H  T  T       TRUE
+3  H  T  H       TRUE
+4  H  T  H       TRUE
+5  T  T  H      FALSE
+6  H  T  H       TRUE
+7  T  H  H      FALSE
 ```
 
 Using `mutate` to asks questions about the trials
@@ -192,140 +196,163 @@ Using `mutate` to asks questions about the trials
 ```r
 library(dplyr)
 notebook <- notebook %>% 
-  mutate(at_least_one_head = (Roll_2 == "H") | (Roll_3 == "H"))
+  mutate(at_least_one_head = (R2 == "H") | (R3 == "H"))
 notebook
 ```
 
 ```
-  Roll_1 Roll_2 Roll_3 first_head at_least_one_head
-1      H      T      T       TRUE             FALSE
-2      T      T      H      FALSE              TRUE
-3      T      T      H      FALSE              TRUE
-4      T      H      T      FALSE              TRUE
-5      H      H      H       TRUE              TRUE
-6      T      T      H      FALSE              TRUE
-7      H      H      H       TRUE              TRUE
+  R1 R2 R3 first_head at_least_one_head
+1  H  T  H       TRUE              TRUE
+2  H  T  T       TRUE             FALSE
+3  H  T  H       TRUE              TRUE
+4  H  T  H       TRUE              TRUE
+5  T  T  H      FALSE              TRUE
+6  H  T  H       TRUE              TRUE
+7  T  H  H      FALSE              TRUE
 ```
+
+Separate (Imperative) Code
+========================================================
+
+```r
+library(dplyr)
+trials <- replicate(7, sample(sides, 3, replace = TRUE))
+notebook <- trials %>% 
+              t() %>% 
+              as.data.frame() %>% 
+              setNames(c("R1", "R2", "R3"))
+notebook <- notebook %>% 
+  mutate(at_least_one_head = (R2 == "H") | (R3 == "H"))
+```
+
+Noticing the pipe pattern
+========================================================
+
+![](./compose_imperative.png)
+
+- The **imperative pipe pattern**: Anytime one pipe starts with the output of the last.
+- We can *compose* the imperative pipe pattern into one pipe
 
 Package the whole process in a pipe
 ========================================================
 
 
 ```r
-notebook <- replicate(100, sample(sides, 3, replace = TRUE)) %>%
-              t() %>%
-              as.data.frame() %>%
-              setNames(c("Roll_1", "Roll_2", "Roll_3")) %>%
-              mutate(first_head = (Roll_1 == "H")) %>%
-              mutate(at_least_one_head = (Roll_2 == "H") | (Roll_3 == "H"))
+notebook <- 
+  replicate(100, sample(sides, 3, replace = TRUE)) %>%
+  t() %>%
+  as.data.frame() %>%
+  setNames(c("R1", "R2", "R3")) %>%
+  mutate(first_head = (R1 == "H")) %>%
+  mutate(at_least_one_head = (R2 == "H") | (R3 == "H"))
 notebook
 ```
 
 ```
-    Roll_1 Roll_2 Roll_3 first_head at_least_one_head
-1        H      T      H       TRUE              TRUE
-2        H      T      H       TRUE              TRUE
-3        T      T      T      FALSE             FALSE
-4        T      T      T      FALSE             FALSE
-5        H      H      T       TRUE              TRUE
-6        T      H      T      FALSE              TRUE
-7        H      T      H       TRUE              TRUE
-8        T      H      H      FALSE              TRUE
-9        T      T      H      FALSE              TRUE
-10       H      H      H       TRUE              TRUE
-11       H      H      H       TRUE              TRUE
-12       H      T      T       TRUE             FALSE
-13       T      T      T      FALSE             FALSE
-14       T      T      T      FALSE             FALSE
-15       H      T      H       TRUE              TRUE
-16       T      T      H      FALSE              TRUE
-17       H      T      H       TRUE              TRUE
-18       H      T      H       TRUE              TRUE
-19       T      T      H      FALSE              TRUE
-20       T      H      H      FALSE              TRUE
-21       T      H      T      FALSE              TRUE
-22       H      H      T       TRUE              TRUE
-23       T      T      H      FALSE              TRUE
-24       T      H      T      FALSE              TRUE
-25       T      T      T      FALSE             FALSE
-26       H      H      T       TRUE              TRUE
-27       T      H      H      FALSE              TRUE
-28       H      T      T       TRUE             FALSE
-29       T      T      H      FALSE              TRUE
-30       T      T      T      FALSE             FALSE
-31       H      H      T       TRUE              TRUE
-32       H      T      H       TRUE              TRUE
-33       T      H      H      FALSE              TRUE
-34       H      H      T       TRUE              TRUE
-35       T      T      T      FALSE             FALSE
-36       H      T      T       TRUE             FALSE
-37       H      T      H       TRUE              TRUE
-38       H      T      H       TRUE              TRUE
-39       T      T      T      FALSE             FALSE
-40       T      T      T      FALSE             FALSE
-41       H      T      H       TRUE              TRUE
-42       H      H      H       TRUE              TRUE
-43       T      H      T      FALSE              TRUE
-44       T      T      T      FALSE             FALSE
-45       H      T      T       TRUE             FALSE
-46       H      T      H       TRUE              TRUE
-47       T      H      H      FALSE              TRUE
-48       H      T      H       TRUE              TRUE
-49       T      H      T      FALSE              TRUE
-50       H      H      H       TRUE              TRUE
-51       H      T      T       TRUE             FALSE
-52       H      T      H       TRUE              TRUE
-53       T      H      H      FALSE              TRUE
-54       T      H      H      FALSE              TRUE
-55       T      H      H      FALSE              TRUE
-56       H      H      H       TRUE              TRUE
-57       T      T      H      FALSE              TRUE
-58       H      H      T       TRUE              TRUE
-59       T      T      T      FALSE             FALSE
-60       H      T      T       TRUE             FALSE
-61       H      H      H       TRUE              TRUE
-62       T      H      T      FALSE              TRUE
-63       H      H      H       TRUE              TRUE
-64       H      H      T       TRUE              TRUE
-65       T      T      T      FALSE             FALSE
-66       T      H      T      FALSE              TRUE
-67       T      T      T      FALSE             FALSE
-68       H      H      H       TRUE              TRUE
-69       T      H      H      FALSE              TRUE
-70       T      H      T      FALSE              TRUE
-71       T      H      H      FALSE              TRUE
-72       H      H      T       TRUE              TRUE
-73       T      H      H      FALSE              TRUE
-74       H      H      H       TRUE              TRUE
-75       T      H      H      FALSE              TRUE
-76       T      H      H      FALSE              TRUE
-77       T      H      H      FALSE              TRUE
-78       H      H      H       TRUE              TRUE
-79       H      H      H       TRUE              TRUE
-80       H      H      H       TRUE              TRUE
-81       T      H      T      FALSE              TRUE
-82       T      H      H      FALSE              TRUE
-83       T      H      T      FALSE              TRUE
-84       T      T      T      FALSE             FALSE
-85       T      T      H      FALSE              TRUE
-86       T      H      H      FALSE              TRUE
-87       T      H      T      FALSE              TRUE
-88       T      T      T      FALSE             FALSE
-89       H      H      T       TRUE              TRUE
-90       H      H      H       TRUE              TRUE
-91       H      T      H       TRUE              TRUE
-92       T      T      H      FALSE              TRUE
-93       H      H      H       TRUE              TRUE
-94       H      T      H       TRUE              TRUE
-95       H      H      H       TRUE              TRUE
-96       H      H      H       TRUE              TRUE
-97       T      T      T      FALSE             FALSE
-98       T      T      H      FALSE              TRUE
-99       T      H      H      FALSE              TRUE
-100      H      H      T       TRUE              TRUE
+    R1 R2 R3 first_head at_least_one_head
+1    T  H  T      FALSE              TRUE
+2    H  T  T       TRUE             FALSE
+3    T  T  T      FALSE             FALSE
+4    H  T  T       TRUE             FALSE
+5    H  T  T       TRUE             FALSE
+6    T  H  T      FALSE              TRUE
+7    T  T  H      FALSE              TRUE
+8    H  T  T       TRUE             FALSE
+9    H  H  T       TRUE              TRUE
+10   H  H  T       TRUE              TRUE
+11   H  H  H       TRUE              TRUE
+12   H  H  H       TRUE              TRUE
+13   H  H  T       TRUE              TRUE
+14   T  T  T      FALSE             FALSE
+15   T  T  T      FALSE             FALSE
+16   T  T  T      FALSE             FALSE
+17   H  T  H       TRUE              TRUE
+18   H  T  H       TRUE              TRUE
+19   T  T  H      FALSE              TRUE
+20   T  T  H      FALSE              TRUE
+21   T  H  T      FALSE              TRUE
+22   T  H  T      FALSE              TRUE
+23   H  H  H       TRUE              TRUE
+24   H  H  H       TRUE              TRUE
+25   T  T  H      FALSE              TRUE
+26   H  H  T       TRUE              TRUE
+27   T  H  T      FALSE              TRUE
+28   T  H  H      FALSE              TRUE
+29   T  H  H      FALSE              TRUE
+30   T  H  T      FALSE              TRUE
+31   T  T  T      FALSE             FALSE
+32   H  T  H       TRUE              TRUE
+33   T  H  H      FALSE              TRUE
+34   T  T  H      FALSE              TRUE
+35   T  H  T      FALSE              TRUE
+36   H  T  H       TRUE              TRUE
+37   H  T  T       TRUE             FALSE
+38   H  H  H       TRUE              TRUE
+39   H  T  T       TRUE             FALSE
+40   T  T  H      FALSE              TRUE
+41   H  H  H       TRUE              TRUE
+42   H  H  T       TRUE              TRUE
+43   T  T  T      FALSE             FALSE
+44   H  H  H       TRUE              TRUE
+45   T  H  H      FALSE              TRUE
+46   H  H  H       TRUE              TRUE
+47   T  H  T      FALSE              TRUE
+48   H  T  H       TRUE              TRUE
+49   T  T  T      FALSE             FALSE
+50   T  T  T      FALSE             FALSE
+51   T  H  H      FALSE              TRUE
+52   T  H  T      FALSE              TRUE
+53   T  T  H      FALSE              TRUE
+54   T  H  H      FALSE              TRUE
+55   T  H  T      FALSE              TRUE
+56   T  T  H      FALSE              TRUE
+57   H  T  H       TRUE              TRUE
+58   T  T  H      FALSE              TRUE
+59   H  T  T       TRUE             FALSE
+60   T  T  T      FALSE             FALSE
+61   T  H  H      FALSE              TRUE
+62   H  H  H       TRUE              TRUE
+63   H  H  H       TRUE              TRUE
+64   H  T  T       TRUE             FALSE
+65   T  T  T      FALSE             FALSE
+66   H  T  T       TRUE             FALSE
+67   H  T  T       TRUE             FALSE
+68   T  H  H      FALSE              TRUE
+69   H  T  T       TRUE             FALSE
+70   H  T  H       TRUE              TRUE
+71   T  T  H      FALSE              TRUE
+72   H  T  H       TRUE              TRUE
+73   H  T  H       TRUE              TRUE
+74   T  T  T      FALSE             FALSE
+75   H  H  T       TRUE              TRUE
+76   T  T  T      FALSE             FALSE
+77   T  H  H      FALSE              TRUE
+78   T  T  T      FALSE             FALSE
+79   H  H  T       TRUE              TRUE
+80   H  H  T       TRUE              TRUE
+81   H  H  T       TRUE              TRUE
+82   H  T  H       TRUE              TRUE
+83   H  T  T       TRUE             FALSE
+84   T  T  T      FALSE             FALSE
+85   T  H  H      FALSE              TRUE
+86   H  H  H       TRUE              TRUE
+87   H  T  T       TRUE             FALSE
+88   T  H  H      FALSE              TRUE
+89   H  H  H       TRUE              TRUE
+90   T  H  H      FALSE              TRUE
+91   H  T  H       TRUE              TRUE
+92   H  H  T       TRUE              TRUE
+93   T  T  H      FALSE              TRUE
+94   T  H  T      FALSE              TRUE
+95   T  T  H      FALSE              TRUE
+96   H  T  T       TRUE             FALSE
+97   T  T  H      FALSE              TRUE
+98   H  T  H       TRUE              TRUE
+99   H  H  T       TRUE              TRUE
+100  T  T  H      FALSE              TRUE
 ```
 
-The `mean` of a logical vector is the number of `TRUE` entries
+The mean of a logical vector is the number of TRUE entries
 ========================================================
 
 - recall that `TRUE` and `FALSE` promotes to 0 and 1
@@ -351,16 +378,116 @@ notebook %>%
 
 ```
   P(first is head) P(at least one head)
-1             0.47                 0.78
+1             0.49                 0.72
 ```
 
 Exercises
 ========================================================
   
 1. Create a data frame for the experiment "Roll 2 fair 6-sided dice"
+  1. Sample from what container?
 2. Create logical columns for each of the following
   1. The first roll is larger than 4
   2. The sum is larger than 7
 3. Estimate the probability of each of the events given above
+
+Simulating a simple experiment with built-in functions
+========================================================
+
+- R can simulate many distributions
+  - `rnorm(N, mu, sigma)` for normal data,
+  - `rbinom(N, n, p)` for binomial data, etc.
+- There give one outcome in a vector
+  - Simple experiment
   
-  
+These functions return vectors
+========================================================
+
+
+```r
+trials <- rnorm(5, 2, 3)
+trials
+```
+
+```
+[1] 5.172790 3.959790 2.147835 3.308878 6.383257
+```
+
+```r
+is.vector(trials)
+```
+
+```
+[1] TRUE
+```
+
+Vectors don't need the transpose
+========================================================
+
+
+```r
+notebook <-
+  rnorm(5, 2, 3) %>%
+  # t() %>% # Skip the transpose
+  as.data.frame %>%
+  setNames(c("X"))
+notebook
+```
+
+```
+          X
+1  8.427333
+2  2.080942
+3 -1.202907
+4 -3.582241
+5  4.249950
+```
+
+Experiments using R "r" functions
+========================================================
+
+
+```r
+notebook <-
+  rnorm(100, 2, 3) %>%
+  as.data.frame() %>%
+  setNames(c("X"))
+```
+
+- pass directly into `as.data.frame`
+- skip `t()`
+
+Simple using replicate and sample
+========================================================
+
+
+```r
+space <- c(1,2,3,4)
+notebook <-
+  replicate(100, 
+            sample(1, 
+                   space, 
+                   replace = TRUE)) %>%
+  as.data.frame()
+```
+- `sample` with $n = 1$
+- pass directly into `as.data.frame`
+- skip `t()`
+
+Compound experiments using `replicate` and `sample`
+========================================================
+
+
+```r
+space <- c(1,2,3,4)
+notebook <-
+  replicate(100, 
+            sample(2, 
+                   space, 
+                   replace = TRUE)) %>%
+  t() %>%
+  as.data.frame()
+```
+- `sample` with $n > 1$
+- `replicate` $\rightarrow$ `t()` $\rightarrow$ `as.data.frame`
+
